@@ -1,0 +1,27 @@
+import os
+import re
+
+folder_path = r"C:\Users\gac8wz\Source\riot-automation-testing\src\test\java\com\bosch\riot\automation"
+
+test_files = os.listdir(folder_path)
+
+for file in test_files:
+    fin = open(os.path.join(folder_path, file), "r")
+
+    new_file_content = ""
+
+    for line in fin:
+        if line.strip().lower().startswith("// bugged"):
+            re_find = re.findall("RIOTX-[0-9]*", line)
+            re_find_new = [("\"" + e + "\"") for e in re_find]
+            bugged_by_string = "\t" + "@BuggedBy(issue = {" + ", ".join(re_find_new) + "})"
+            new_line = line.replace(line, bugged_by_string)
+            new_file_content += new_line + "\n"
+        else:
+            new_file_content += line
+    fin.close()
+
+    fout = open(os.path.join(folder_path, file), "w")
+    fout.write(new_file_content)
+    fout.close()
+    
